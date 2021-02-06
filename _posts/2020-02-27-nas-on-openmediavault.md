@@ -243,7 +243,7 @@ drwxr-xr-x 3 hongbo users 4096 11月 29 08:16 /var/lib/docker/volumes/file_brows
 
 相比 Plex 博主更喜欢 Emby。镜像地址：[Docker Hub - emby/embyserver](https://hub.docker.com/r/emby/embyserver/)
 
-同样的，embyserver 容器的 `UID/GID` 环境变量如果只想方便可分别填写 `1000` 和 `100` 即你的 openmediavault 使用用户和 `users` 组，如果想最小化运行权限，可填写[创建容器专用用户](#创建容器专用用户安全考虑)一节创建的 application 用户和用户组，同时将第 Emby 的 volume 目录属主修改为 `application`（用户组保持 users 不变）,开放给容器访问：
+同样的，embyserver 容器的 `UID/GID` 环境变量如果只想方便可分别填写 `1000` 和 `100` 即你的 openmediavault 使用用户和 `users` 组，如果想最小化运行权限，可填写[创建容器专用用户](#创建容器专用用户可选)一节创建的 application 用户和用户组，同时将第 Emby 的 volume 目录属主修改为 `application`（用户组保持 users 不变）,开放给容器访问：
     
 ```sh
 chown application transmission_volume_directory
