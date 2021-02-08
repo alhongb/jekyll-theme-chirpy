@@ -99,7 +99,7 @@ openmediavault 成功运行后，就可以用其 Web 图形界面组建 RAID 和
 - 属主修改为该用户
 - 用户组修改为该用户对应的专用用户组，而非 users 组（这要求你提前建立好用户组）
 
-修改好以后，不同用户间就没有权限访问对方的共享目录了，但是在 Samba 中，还是会看到这些共享目录，要对无权限者屏蔽共享目录，可在 SMB/CIFS 中对这些共享目录设置一条 extra options，内容为：
+修改好以后，不同用户间就没有权限访问对方的共享目录了，但是在 Samba 中，无权限者还是会看到这些共享目录，要对无权限者屏蔽这些共享目录，可在 SMB/CIFS 中对这些共享目录设置一条 `extra options`，内容为：
 
 ```
 access based share enum = yes
@@ -151,7 +151,7 @@ Docker 支持三种文件系统实现：`volume`，`bind mount` 和 `tmpfs mount
 使用命令行新建名为 `application` 的用户：
 
 ```sh
-sudo useradd -g nogroup application
+sudo useradd application
 ```
 
 查询 `application` 用户的 UID 和 GID：
@@ -159,10 +159,10 @@ sudo useradd -g nogroup application
 ```sh
 id application
 
-uid=1001(application) gid=65534(nogroup) 组=65534(nogroup)
+uid=1001(application) gid=1001(application) 组=1001(application)
 ```
 
-可以看到新的的用户 ID 是 1001。
+可以看到我的系统中新用户 ID 是 1001，组 ID 也是 1001。
 
 那么，如何使用这个新用户来应用权限最小化安全实践？概括而言就是两个方面操作：
 
@@ -174,6 +174,12 @@ uid=1001(application) gid=65534(nogroup) 组=65534(nogroup)
 >你可能有疑问，如果容器服务以 application 的 UID 和 nogroup 运行，在共享目录创建的文件属主将是 application，那其他用户能也访问吗的？
 >
 >答案是肯定的。这是因为 openmediavault 共享目录的用户组都是 users，并默认有 setgid 标志位，这使得容器服务在其下创建的子目录和文件将都与共享目录一致，即 users 组。
+
+注意：有些时候上面所说的 setgid 对容器不起作用，为了让其他用户能访问容器创建的文件，还需要将该用户加入到 application 组中：
+
+```
+usermod -a -G application youruser
+```
 
 ### 部署 Transmission 容器
 
