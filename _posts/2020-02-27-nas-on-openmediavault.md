@@ -105,6 +105,8 @@ openmediavault 成功运行后，就可以用其 Web 图形界面组建 RAID 和
 access based share enum = yes
 ```
 
+同时在 Shared Folders - Privileges 选项中显式拒绝其他用户的访问权限。（正如其说明，Privileges 只会影响共享服务的权限配置，而不会反映到文件系统）
+
 ## 安装 Docker 环境
 
 ### 安装 Docker
