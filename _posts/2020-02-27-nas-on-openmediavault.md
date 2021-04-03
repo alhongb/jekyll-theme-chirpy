@@ -148,38 +148,16 @@ Docker 支持三种文件系统实现：`volume`，`bind mount` 和 `tmpfs mount
 
 出于安全考虑，创建一个专用的低权限用户来运行各项容器，用以实践权限最小化原则。
 
-使用命令行新建名为 `application` 的用户：
+首先直接在 openmediavault 界面中创建一个名为 application 的用户（默认的用户组为 users）。
 
-```sh
-sudo useradd application
-```
+那么，未后续如何使用这个新用户来应用权限最小化安全实践？概括而言就是两个方面操作：
 
-查询 `application` 用户的 UID 和 GID：
+1. 将用户 ID 后续作为所有容器的启动参数，使得容器进程以 application 用户身份和和组运行；
+2. 对于需要限制容器访问的目录，通过 ACL 限制 application 用户对该目录的访问。
 
-```sh
-id application
-
-uid=1001(application) gid=1001(application) 组=1001(application)
-```
-
-可以看到我的系统中新用户 ID 是 1001，组 ID 也是 1001。
-
-那么，如何使用这个新用户来应用权限最小化安全实践？概括而言就是两个方面操作：
-
-1. 将用户 ID 后续作为所有容器的启动参数，使得容器进程以 application 用户身份运行；
-2. 对于需要开放给容器访问的目录，将属主修改为 application 或使用 openmediavault GUI 共享文件夹 - ACL 赋予 application 用户以该目录读写权限。
-
->这里使用命令行而不用 openmediavault 界面来创建用户，是因为默认情况下 openmediavault 将所有 NAS 用户归属在 `users` 组，而 `user` 组具备大部分共享文件夹的访问权限（默认情况下，openmediavault 创建的所有共享目录都对 `users` 组可读）,会导致权限会过大。
-
->你可能有疑问，如果容器服务以 application 的 UID 和 nogroup 运行，在共享目录创建的文件属主将是 application，那其他用户能也访问吗的？
+>你可能有疑问，如果容器服务以 application 的 UID 和 GID 运行，在共享目录创建的文件属主将是 application，那其他用户能也访问吗的？
 >
 >答案是肯定的。这是因为 openmediavault 共享目录的用户组都是 users，并默认有 setgid 标志位，这使得容器服务在其下创建的子目录和文件将都与共享目录一致，即 users 组。
-
-注意：有些时候上面所说的 setgid 对容器不起作用，为了让其他用户能访问容器创建的文件，还需要将该用户加入到 application 组中：
-
-```
-usermod -a -G application youruser
-```
 
 ### 部署 Transmission 容器
 
