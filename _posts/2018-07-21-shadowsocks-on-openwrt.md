@@ -216,7 +216,7 @@ OpenWrt 管理面 `Network` -> `DHCP and DNS`
 
 到此步骤为止，之前的配置已足以让接入局域网的设备正常翻墙，但为了让路由器自身发起的连接也能够翻墙成功，需要将 WAN 口默认使用的运营商 DNS 修改为 ChinaDNS
 
-如图所示，在 `Network - Interfaces - WAN - Advanced Settings` 中去掉 `Use DNS servers advertised by peer` ，并在配置栏中填入 `127.0.0.1`
+如图所示，在 `Network - Interfaces - WAN、WWAN（无线接入时） - Advanced Settings` 中去掉 `Use DNS servers advertised by peer` ，并在配置栏中填入 `127.0.0.1`
 
 ![OpenWrt WAN DNS Configuration](/assets/img/post/wan-advanced-settings.jpg)
 
@@ -225,11 +225,11 @@ OpenWrt 管理面 `Network` -> `DHCP and DNS`
 
 ## 常见问题处理
 
-- Shadowsocks 无法启动
+- **Shadowsocks 无法启动**
 
 重启路由器。如果仍未解决，使用 `logread` 命令查看异常日志
 
-- Luci 界面无法打开
+- **Luci 界面无法打开**
 
 点击安装好 Shadowsocks 或 ChinaDNS 的 Luci APP 报错
 
@@ -259,3 +259,31 @@ OpenWrt 19.07 或更新版本会报此错误，原因是缺少 `luci-compat` 包
 ```sh
 opkg install luci-compat
 ```
+
+- **路由器无法连接 raw.githubusercontent.com**
+
+openwrt 下载 `china_ip_list.txt` 时出现如下错误
+
+```
+wget https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt -O /tmp/china_ip_list.txt && mv /tmp/china_ip_list.txt /etc/chinadns_chnroute.txt
+
+--2021-05-16 19:50:02--  https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt
+Resolving raw.githubusercontent.com... 0.0.0.0, ::
+Connecting to raw.githubusercontent.com|0.0.0.0|:443... failed: Connection refused.
+Connecting to raw.githubusercontent.com|::|:443... failed: Connection refused.
+```
+
+明显 raw.githubusercontent.com 的 IP 地址被错误地解析到了 0.0.0.0，说明被 GFW DNS 污染了。执行 nslookup 进行验证：
+
+```
+root@OpenWrt:~# nslookup raw.githubusercontent.com
+Server:         192.168.3.1
+Address:        192.168.3.1#53
+
+Name:      raw.githubusercontent.com
+Address 1: 0.0.0.0
+Address 2: ::
+```
+
+发现 openwrt 使用的 DNS 是上游分配的 DNS，按 [Step 6 - 让路由器自身也翻墙](#step-6---让路由器自身也翻墙可选)处理即可。
+
