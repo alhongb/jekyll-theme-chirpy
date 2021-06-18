@@ -7,9 +7,11 @@ seo:
   date_modified: 2020-03-02 22:56:24 +0800
 ---
 
+## 简介
+
 在 OpenWrt 路由器上安装 server 版 Shadowsocks，使得客户端设备能够以 VPN 的形式远程连接到家庭局域网。
 
-## 在 OpenWrt 上安装 Shadowsocks Server
+## 安装 Shadowsocks Server
 
 ### Step 1 - 安装 shadowsocks-libev-server 软件包
 
@@ -57,8 +59,10 @@ ss-server -u -c /etc/shadowsocks-server.json &
 
 到此所有安装配置工作完成。
 
-## 远程连接到 Shadowsocks Server
+## 手机远程连接到内部网络
 
-以 Android 客户端为例：路由规则选择`全局`，让手机全局连接到路由器以访问内网服务，此外为了让手机能正常解析域名和上网，还需要将 `远程 DNS` 选项修改为 127.0.0.1（OpenWrt 的 dnsmasq DNS 服务）并勾选 `使用 UDP DNS`。
+以 Android 客户端为例：路由规则选择`全局`，让手机全局连接到路由器以访问内网服务，此外为了能正常解析域名（包括内网主机名），还需要将 `远程 DNS` 选项修改为 192.168.1.1（指向 OpenWrt 内建的 dnsmasq DNS 服务）并勾选 `使用 UDP DNS`。
+
+2021-06 更新：新版本 Shadowsocks 客户端 DNS 按上述方法配置似乎只能解析内网主机，外网无法解析，此时保持默认的 dns.google 即可修复。
 
 ![Shadowsocks Clent Config](/assets/img/post/client-configuration-for-openwrt-shadowsocks-server.jpg)
